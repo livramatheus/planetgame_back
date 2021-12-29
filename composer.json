@@ -1,0 +1,15 @@
+{
+    "name": "livramatheus/planetgame_back",
+    "description": "Back-end of a personal project based on PHP and React",
+    "autoload": {
+        "psr-4": {
+            "Livramatheus\\PlanetgameBack\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "livramateus"
+        }
+    ],
+    "require": {}
+}
