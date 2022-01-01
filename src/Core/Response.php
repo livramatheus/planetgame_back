@@ -28,7 +28,7 @@ class Response {
     }
 
     public function getDataJson() : string {
-        return json_encode(['data' => $this->data]);
+        return json_encode(['data' => utf8_encode($this->data)]);
     }
 
     public function send() {
