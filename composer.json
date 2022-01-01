@@ -11,6 +11,9 @@
             "name": "livramateus"
         }
     ],
+    "require": {
+        "php": "^8.0.0"
+    },
     "require-dev": {
         "phpunit/phpunit": "^9.5"
     }
