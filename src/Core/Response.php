@@ -27,8 +27,13 @@ class Response {
         $this->responseCode = $responseCode;
     }
 
+    /**
+     * @todo utf8_encode was used to fix strings with special characters,
+     * however when "data" is an object or an array, utf8_encode crashes
+     * for now, it will be removed
+     */
     public function getDataJson() : string {
-        return json_encode(['data' => utf8_encode($this->data)]);
+        return json_encode(['data' => $this->data]);
     }
 
     public function send() {
