@@ -130,16 +130,11 @@ class Publisher implements DefaultApiResponse, InputValidation {
     }
 
     private function isFilled() : bool {
-        $name    = $this->ModelPublisher->getName();
-        $founded = $this->ModelPublisher->getFounded();
-        $logo    = $this->ModelPublisher->getLogo();
-        $website = $this->ModelPublisher->getWebsite();
-
         return (
-            !empty($name)    &&
-            !empty($founded) &&
-            !empty($logo)    &&
-            !empty($website)
+            !empty($this->ModelPublisher->getName())    &&
+            !empty($this->ModelPublisher->getFounded()) &&
+            !empty($this->ModelPublisher->getLogo())    &&
+            !empty($this->ModelPublisher->getWebsite())
         );
     }
 
