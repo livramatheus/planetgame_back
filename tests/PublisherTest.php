@@ -1,6 +1,7 @@
 <?php
 
-use Livramatheus\PlanetgameBack\Controllers\Publisher as ControllerPublisher;
+use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
+use Livramatheus\PlanetgameBack\Core\Exceptions\ItemNotFoundException;
 use Livramatheus\PlanetgameBack\Models\Publisher as ModelPublisher;
 use PHPUnit\Framework\TestCase;
 
@@ -15,7 +16,7 @@ class PublisherTest extends TestCase {
     // get() - Existing publisher
     public function testGetExistingPublisher() {
         $ModelPublisher = new ModelPublisher();
-        $ModelPublisher->setId(3);
+        $ModelPublisher->setId(45);
 
         $this->assertInstanceOf('Livramatheus\\PlanetgameBack\\Models\\Publisher', $ModelPublisher->get());
         $this->assertIsString($ModelPublisher->getName());
@@ -27,7 +28,7 @@ class PublisherTest extends TestCase {
         $ModelPublisher = new ModelPublisher();
         $ModelPublisher->setId(0);
 
-        $this->expectErrorMessage('Notice: Publisher not found.');
+        $this->expectException(ItemNotFoundException::class);
         $ModelPublisher->get();
     }
 
@@ -46,16 +47,16 @@ class PublisherTest extends TestCase {
         $ModelPublisher = new ModelPublisher();
         $ModelPublisher->setId(0);
 
-        $this->expectExceptionMessage('Notice: Publisher not found.');
+        $this->expectException(ItemNotFoundException::class);
         $ModelPublisher->delete();
     }
 
     // delete() - Publisher with relations to another table
     public function testDeletePublisherRelatedToGame() {
         $ModelPublisher = new ModelPublisher();
-        $ModelPublisher->setId(3);
+        $ModelPublisher->setId(45);
 
-        $this->expectExceptionMessage('Something went wrong with the database.');
+        $this->expectException(DatabaseException::class);
         $ModelPublisher->delete();
     }
 

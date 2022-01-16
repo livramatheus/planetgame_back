@@ -1,5 +1,6 @@
 <?php
 
+use Livramatheus\PlanetgameBack\Core\Exceptions\ItemNotFoundException;
 use PHPUnit\Framework\TestCase;
 use Livramatheus\PlanetgameBack\Models\Game as ModelGame;
 
@@ -28,7 +29,7 @@ class GameTest extends TestCase {
         $ModelGame = new ModelGame();
         $ModelGame->setId(-1);
 
-        $this->expectErrorMessage('Notice: Game not found!');
+        $this->expectException(ItemNotFoundException::class);
         $ModelGame->get();
     }
 
@@ -47,7 +48,7 @@ class GameTest extends TestCase {
         $ModelGame = new ModelGame();
         $ModelGame->setId(-1);
 
-        $this->expectExceptionMessage('Notice: Game not found.');
+        $this->expectException(ItemNotFoundException::class);
         $ModelGame->delete();
     }
 

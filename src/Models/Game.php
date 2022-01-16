@@ -2,11 +2,12 @@
 
 namespace Livramatheus\PlanetgameBack\Models;
 
-use Exception;
+use Livramatheus\PlanetgameBack\Core\Exceptions\ItemNotFoundException;
 use JsonSerializable;
 use Livramatheus\PlanetgameBack\Models\Publisher as ModelPublisher;
 use Livramatheus\PlanetgameBack\Models\Genre as ModelGenre;
 use Livramatheus\PlanetgameBack\Core\Connection;
+use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
 use PDO;
 use PDOException;
 use RelativeTime\RelativeTime;
@@ -142,7 +143,7 @@ class Game implements JsonSerializable {
         $res = $PdoTransac->fetch(PDO::FETCH_ASSOC);
         
         if (!$PdoTransac->rowCount()) {
-            throw new Exception('Notice: Game not found!');
+            throw new ItemNotFoundException();
         }
 
         $ModelPublisher = new ModelPublisher();
@@ -173,12 +174,12 @@ class Game implements JsonSerializable {
         
         try {
             $PdoTransac->execute($params);
-        } catch (Exception $Error) {
-            throw new Exception($Error->getMessage());
+        } catch (PDOException $Error) {
+            throw new DatabaseException();
         }
 
         if ($PdoTransac->rowCount() == 0) {
-            throw new Exception('Notice: Game not found.');
+            throw new ItemNotFoundException();
         }
 
     }
@@ -200,7 +201,7 @@ class Game implements JsonSerializable {
         try {
             $PdoTransac->execute($params);
         } catch (PDOException $Error) {
-            throw new Exception($Error->getMessage());
+            throw new DatabaseException();
         }
     }
 
