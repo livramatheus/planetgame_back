@@ -5,6 +5,7 @@ namespace Livramatheus\PlanetgameBack\Models;
 use Exception;
 use JsonSerializable;
 use Livramatheus\PlanetgameBack\Core\Connection;
+use Livramatheus\PlanetgameBack\Core\Exceptions\ItemNotFoundException;
 use PDO;
 use PDOException;
 use RelativeTime\RelativeTime;
@@ -108,7 +109,7 @@ class Publisher implements JsonSerializable {
         $res = $PdoTransac->fetch(PDO::FETCH_ASSOC);
 
         if (!$PdoTransac->rowCount()) {
-            throw new Exception('Notice: Publisher not found.');
+            throw new ItemNotFoundException();
         }
 
         $this->setName($res['name']);
@@ -132,11 +133,11 @@ class Publisher implements JsonSerializable {
         try {
             $PdoTransac->execute($params);
         } catch (PDOException $Error) {
-            throw new Exception('Something went wrong with the database.');
+            throw new Exception($Error->getMessage());
         }
 
         if ($PdoTransac->rowCount() == 0) {
-            throw new Exception('Notice: Publisher not found.');
+            throw new ItemNotFoundException();
         }
     }
 
