@@ -9,6 +9,9 @@ use Livramatheus\PlanetgameBack\Interfaces\ApiController;
 
 class Genre implements DefaultApiResponse, ApiController {
 
+    /** @var ModelGenre */
+    private ModelGenre $ModelGenre;
+
     private $action;
     private $getParams;
 
@@ -38,10 +41,10 @@ class Genre implements DefaultApiResponse, ApiController {
     }
 
     private function getAll() {
-        $ModelGenre = new ModelGenre();
+        $this->ModelGenre = new ModelGenre();
         $Response   = new Response();
 
-        $Response->setData($ModelGenre->getAll());
+        $Response->setData($this->ModelGenre->getAll());
         $Response->setResponseCode(200);
         $Response->send();
     }
