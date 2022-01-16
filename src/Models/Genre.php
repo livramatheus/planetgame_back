@@ -31,7 +31,18 @@ class Genre implements JsonSerializable {
         $sql = 'SELECT * FROM tb_genre;';
         $PdoTransac = Connection::getConn()->query($sql);
 
-        return $PdoTransac->fetchAll(PDO::FETCH_ASSOC); 
+        $data = [];
+
+        while ($row = $PdoTransac->fetch(PDO::FETCH_ASSOC)) {
+            $ModelGenre = new Genre();
+
+            $ModelGenre->setId($row['id']);
+            $ModelGenre->setName($row['name']);
+
+            $data[] = $ModelGenre;
+        }
+
+        return $data;
     }
 
     public function jsonSerialize() {

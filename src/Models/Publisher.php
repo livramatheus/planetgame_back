@@ -68,14 +68,27 @@ class Publisher implements JsonSerializable {
     }
 
     public function getAll() {
-        $sql = 'SELECT `id`,
-                       `name`,
-                       `website`
+        $sql = 'SELECT *
                   FROM `tb_publisher`;';
 
         $PdoTransac = Connection::getConn()->query($sql);
 
-        return $PdoTransac->fetchAll(PDO::FETCH_ASSOC);
+        $data = [];
+
+        while ($row = $PdoTransac->fetch(PDO::FETCH_ASSOC)) {
+            $ModelPublisher = new Publisher();
+
+            $ModelPublisher->setId($row['id']);
+            $ModelPublisher->setName($row['name']);
+            $ModelPublisher->setWebsite($row['website']);
+            $ModelPublisher->setLogo($row['logo']);
+            $ModelPublisher->setFounded($row['founded']);
+            $ModelPublisher->setAge($row['founded']);
+
+            $data[] = $ModelPublisher;
+        }
+
+        return $data;
     }
 
     public function get() {

@@ -5,13 +5,14 @@ namespace Livramatheus\PlanetgameBack\Controllers;
 use Livramatheus\PlanetgameBack\Core\Response,
     Livramatheus\PlanetgameBack\Models\Genre as ModelGenre,
     Livramatheus\PlanetgameBack\Interfaces\DefaultApiResponse;
+use Livramatheus\PlanetgameBack\Interfaces\ApiController;
 
-class Genre implements DefaultApiResponse {
+class Genre implements DefaultApiResponse, ApiController {
 
     private $action;
     private $getParams;
 
-    public function init($action, $getParams) {
+    public function init($action, $getParams) : void {
         $this->action    = $action;
         $this->getParams = $getParams;
         

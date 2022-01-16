@@ -4,12 +4,13 @@ namespace Livramatheus\PlanetgameBack\Controllers;
 
 use Exception;
 use Livramatheus\PlanetgameBack\Core\Response;
+use Livramatheus\PlanetgameBack\Interfaces\ApiController;
 use Livramatheus\PlanetgameBack\Interfaces\DefaultApiResponse;
 use Livramatheus\PlanetgameBack\Interfaces\InputValidation;
 use Livramatheus\PlanetgameBack\Models\Publisher as ModelPublisher;
 use mofodojodino\ProfanityFilter\Check;
 
-class Publisher implements DefaultApiResponse, InputValidation {
+class Publisher implements DefaultApiResponse, InputValidation, ApiController {
 
     /** @var ModelPublisher */
     private ModelPublisher $ModelPublisher;
@@ -17,7 +18,7 @@ class Publisher implements DefaultApiResponse, InputValidation {
     private $action;
     private $getParams;
 
-    public function init($action, $getParams) {
+    public function init($action, $getParams) : void {
         $this->action    = $action;
         $this->getParams = $getParams;
         
