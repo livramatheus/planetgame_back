@@ -2,9 +2,9 @@
 
 namespace Livramatheus\PlanetgameBack\Models;
 
-use JsonSerializable,
-    Livramatheus\PlanetgameBack\Core\Connection,
-    PDO;
+use JsonSerializable;
+use Livramatheus\PlanetgameBack\Core\Connection;
+use PDO;
 
 class Genre implements JsonSerializable {
 

@@ -1,7 +1,7 @@
 <?php
 
-use PHPUnit\Framework\TestCase,
-    Livramatheus\PlanetgameBack\Models\Genre as ModelGenre;
+use PHPUnit\Framework\TestCase;
+use Livramatheus\PlanetgameBack\Models\Genre as ModelGenre;
 
 class GenreTest extends TestCase {
 
