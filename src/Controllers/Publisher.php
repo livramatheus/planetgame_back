@@ -81,12 +81,12 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
         $Response = new Response();
         
         if (!empty($this->getParams)) {
-            $ModelPublisher = new ModelPublisher();
-            $ModelPublisher->setId($this->getParams);
+            $this->ModelPublisher = new ModelPublisher();
+            $this->ModelPublisher->setId($this->getParams);
             $Response->setResponseCode(200);
             
             try {
-                $ModelPublisher->delete();
+                $this->ModelPublisher->delete();
                 $Response->setData('Publisher deleted successfully!');
             } catch (Exception $Exception) {
                 $Response->setData($Exception->getMessage());
