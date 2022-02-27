@@ -3,6 +3,7 @@
 namespace Livramatheus\PlanetgameBack\Controllers;
 
 use Exception;
+use Livramatheus\PlanetgameBack\Core\ErrorLog;
 use Livramatheus\PlanetgameBack\Core\PostUtils;
 use Livramatheus\PlanetgameBack\Interfaces\DefaultApiResponse;
 use Livramatheus\PlanetgameBack\Models\Game as ModelGame;
@@ -70,6 +71,7 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
                 $dbData = $this->ModelGame->get();
                 $Response->setData($dbData);
             } catch (Exception $Error) {
+                ErrorLog::log($Error);
                 $Response->setData($Error->getMessage());
             }
         } else {
@@ -91,6 +93,7 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
                 $this->ModelGame->delete();
                 $Response->setData('Game deleted successfully!');
             } catch (Exception $Error) {
+                ErrorLog::log($Error);
                 $Response->setData($Error->getMessage());
             }
 
@@ -110,6 +113,7 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
                 $this->ModelGame->insert();
                 $Response->setData('Publisher inserted successfully!');
             } catch (Exception $Error) {
+                ErrorLog::log($Error);
                 $Response->setData($Error->getMessage());
             }
         } else {

@@ -7,6 +7,7 @@ use JsonSerializable;
 use Livramatheus\PlanetgameBack\Models\Publisher as ModelPublisher;
 use Livramatheus\PlanetgameBack\Models\Genre as ModelGenre;
 use Livramatheus\PlanetgameBack\Core\Connection;
+use Livramatheus\PlanetgameBack\Core\ErrorLog;
 use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
 use PDO;
 use PDOException;
@@ -175,6 +176,7 @@ class Game implements JsonSerializable {
         try {
             $PdoTransac->execute($params);
         } catch (PDOException $Error) {
+            ErrorLog::log($Error);
             throw new DatabaseException();
         }
 
@@ -201,7 +203,7 @@ class Game implements JsonSerializable {
         try {
             $PdoTransac->execute($params);
         } catch (PDOException $Error) {
-            error_log('ERROR: ' . $Error->getMessage());
+            ErrorLog::log($Error);
             throw new DatabaseException();
         }
     }

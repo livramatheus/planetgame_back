@@ -3,6 +3,7 @@
 namespace Livramatheus\PlanetgameBack\Controllers;
 
 use Exception;
+use Livramatheus\PlanetgameBack\Core\ErrorLog;
 use Livramatheus\PlanetgameBack\Core\Response;
 use Livramatheus\PlanetgameBack\Interfaces\ApiController;
 use Livramatheus\PlanetgameBack\Interfaces\DefaultApiResponse;
@@ -67,6 +68,7 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
                 $dbData = $this->ModelPublisher->get();
                 $Response->setData($dbData);
             } catch (Exception $Exception) {
+                ErrorLog::log($Exception);
                 $Response->setData($Exception->getMessage());
             }
         } else {
@@ -89,6 +91,7 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
                 $this->ModelPublisher->delete();
                 $Response->setData('Publisher deleted successfully!');
             } catch (Exception $Exception) {
+                ErrorLog::log($Exception);
                 $Response->setData($Exception->getMessage());
             }
 
@@ -107,7 +110,8 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
             try {
                 $this->ModelPublisher->insert();
                 $Response->setData('Publisher inserted successfully!');
-            } catch(Exception $Error) {
+            } catch (Exception $Error) {
+                ErrorLog::log($Error);
                 $Response->setData($Error->getMessage());
             }
         } else {
