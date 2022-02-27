@@ -114,6 +114,7 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
                 $Response->setData('Publisher inserted successfully!');
             } catch (Exception $Error) {
                 ErrorLog::log($Error);
+                $Response->setResponseCode(400);
                 $Response->setData($Error->getMessage());
             }
         } else {
