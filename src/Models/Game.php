@@ -201,6 +201,7 @@ class Game implements JsonSerializable {
         try {
             $PdoTransac->execute($params);
         } catch (PDOException $Error) {
+            error_log('ERROR: ' . $Error->getMessage());
             throw new DatabaseException();
         }
     }
