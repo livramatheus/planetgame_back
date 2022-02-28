@@ -4,6 +4,8 @@ namespace Livramatheus\PlanetgameBack;
 use Livramatheus\PlanetgameBack\Core\Router;
 
 require __DIR__ . '/vendor/autoload.php';
+header('Content-Type: application/json');
+header("Access-Control-Allow-Origin: *");
 
 /* 
  * This file will only be required on dev environment,

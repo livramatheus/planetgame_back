@@ -24,8 +24,10 @@ class Connection {
             try {
                 self::$conn = new PDO('mysql:host=' .$host. ';dbname=' . $dbname, $user, $password);
             } catch (PDOException $Error) {
+                ErrorLog::log($Error);
                 $Response = new Response();
-                $Response->setData('Database Error: ' .$Error->getMessage());
+                $Response->setResponseCode(400);
+                $Response->setData('Database Error. Try again later.');
                 $Response->send();
             }
         }

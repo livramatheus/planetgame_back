@@ -4,6 +4,7 @@ namespace Livramatheus\PlanetgameBack\Models;
 
 use JsonSerializable;
 use Livramatheus\PlanetgameBack\Core\Connection;
+use Livramatheus\PlanetgameBack\Core\ErrorLog;
 use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
 use Livramatheus\PlanetgameBack\Core\Exceptions\ItemNotFoundException;
 use PDO;
@@ -133,6 +134,7 @@ class Publisher implements JsonSerializable {
         try {
             $PdoTransac->execute($params);
         } catch (PDOException $Error) {
+            ErrorLog::log($Error);
             throw new DatabaseException();
         }
 
@@ -155,6 +157,7 @@ class Publisher implements JsonSerializable {
                 $this->website
             ]);
         } catch (PDOException $Error) {
+            ErrorLog::log($Error);
             throw new DatabaseException();
         }
     }

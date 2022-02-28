@@ -3,6 +3,8 @@
 namespace Livramatheus\PlanetgameBack\Controllers;
 
 use Exception;
+use Livramatheus\PlanetgameBack\Core\ErrorLog;
+use Livramatheus\PlanetgameBack\Core\PostUtils;
 use Livramatheus\PlanetgameBack\Interfaces\DefaultApiResponse;
 use Livramatheus\PlanetgameBack\Models\Game as ModelGame;
 use Livramatheus\PlanetgameBack\Models\Genre as ModelGenre;
@@ -69,6 +71,7 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
                 $dbData = $this->ModelGame->get();
                 $Response->setData($dbData);
             } catch (Exception $Error) {
+                ErrorLog::log($Error);
                 $Response->setData($Error->getMessage());
             }
         } else {
@@ -90,6 +93,7 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
                 $this->ModelGame->delete();
                 $Response->setData('Game deleted successfully!');
             } catch (Exception $Error) {
+                ErrorLog::log($Error);
                 $Response->setData($Error->getMessage());
             }
 
@@ -109,6 +113,8 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
                 $this->ModelGame->insert();
                 $Response->setData('Publisher inserted successfully!');
             } catch (Exception $Error) {
+                ErrorLog::log($Error);
+                $Response->setResponseCode(400);
                 $Response->setData($Error->getMessage());
             }
         } else {
@@ -150,11 +156,13 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         $this->ModelGame->setModelGenre(new ModelGenre());
         $this->ModelGame->setModelPublisher(new ModelPublisher());
 
-        $this->ModelGame->setName                   (filter_input(INPUT_POST, 'name'        , FILTER_SANITIZE_STRING));
-        $this->ModelGame->setReleaseDate            (filter_input(INPUT_POST, 'release_date', FILTER_SANITIZE_STRING));
-        $this->ModelGame->setAbstract               (filter_input(INPUT_POST, 'abstract'    , FILTER_SANITIZE_STRING));
-        $this->ModelGame->getModelPublisher()->setId(filter_input(INPUT_POST, 'publisher'   , FILTER_SANITIZE_NUMBER_INT));
-        $this->ModelGame->getModelGenre()->setId    (filter_input(INPUT_POST, 'genre'       , FILTER_SANITIZE_NUMBER_INT));
+        $data = PostUtils::getPostInput();
+
+        $this->ModelGame->setName                   (filter_var($data['name']        , FILTER_SANITIZE_STRING));
+        $this->ModelGame->setReleaseDate            (filter_VAR($data['release_date'], FILTER_SANITIZE_STRING));
+        $this->ModelGame->setAbstract               (filter_var($data['abstract']    , FILTER_SANITIZE_STRING));
+        $this->ModelGame->getModelPublisher()->setId(filter_var($data['publisher']   , FILTER_SANITIZE_NUMBER_INT));
+        $this->ModelGame->getModelGenre()->setId    (filter_var($data['genre']       , FILTER_SANITIZE_NUMBER_INT));
 
         return ($this->isProfanityClear() && $this->isFilled());
     }
