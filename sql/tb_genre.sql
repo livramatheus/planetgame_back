@@ -1,3 +1,8 @@
+CREATE TABLE `tb_genre` (
+  `id` int(11) NOT NULL,
+  `name` varchar(30) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 INSERT INTO `tb_genre`(`id`, `name`) VALUES ('1', 'Action'),
                                             ('11', 'Strategy'),
                                             ('21', 'Sports'),
@@ -48,3 +53,9 @@ INSERT INTO `tb_genre`(`id`, `name`) VALUES ('1', 'Action'),
                                             ('471', 'Shoot Em Up'),
                                             ('481', 'Gambling'),
                                             ('491', 'MOBA');
+
+ALTER TABLE `tb_genre`
+  ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `tb_genre`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;

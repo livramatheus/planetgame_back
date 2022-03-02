@@ -1,3 +1,11 @@
+CREATE TABLE `tb_publisher` (
+  `id` int(11) NOT NULL,
+  `name` varchar(60) NOT NULL,
+  `founded` date NOT NULL,
+  `logo` varchar(60) NOT NULL,
+  `website` varchar(40) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 INSERT INTO `tb_publisher`(`id`, `name`, `founded`, `logo`, `website`)
      VALUES ('1'  , 'Activision'          , '1979-10-01', 'activision.png'        ,'https://www.activision.com/'),
             ('11' , 'Konami'              , '1969-03-21', 'konami.png'            ,'https://www.konami.com/'),
@@ -11,3 +19,9 @@ INSERT INTO `tb_publisher`(`id`, `name`, `founded`, `logo`, `website`)
             ('91' , 'Midway Games'        , '1958-01-01', 'midway_games.png'      ,'https://warnerbrosgames.com/'),
             ('101', 'Warner Bros Games'   , '2004-01-14', 'warner_bros_games.png' ,'https://warnerbrosgames.com/'),
             ('111', 'Capcom'              , '1979-05-30', 'capcom.png'            ,'https://capcom.com/');
+
+ALTER TABLE `tb_publisher`
+  ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `tb_publisher`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
