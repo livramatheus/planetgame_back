@@ -131,7 +131,8 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         return !(
             $ProfCheck->hasProfanity($this->ModelGame->getName())        ||
             $ProfCheck->hasProfanity($this->ModelGame->getReleaseDate()) ||
-            $ProfCheck->hasProfanity($this->ModelGame->getAbstract())
+            $ProfCheck->hasProfanity($this->ModelGame->getAbstract())    ||
+            $ProfCheck->hasProfanity($this->ModelGame->getContributor())
         );
     }
 
@@ -161,6 +162,7 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         $this->ModelGame->setName                   (filter_var($data['name']        , FILTER_SANITIZE_STRING));
         $this->ModelGame->setReleaseDate            (filter_VAR($data['release_date'], FILTER_SANITIZE_STRING));
         $this->ModelGame->setAbstract               (filter_var($data['abstract']    , FILTER_SANITIZE_STRING));
+        $this->ModelGame->setContributor            (filter_var($data['contributor'] , FILTER_SANITIZE_STRING));
         $this->ModelGame->getModelPublisher()->setId(filter_var($data['publisher']   , FILTER_SANITIZE_NUMBER_INT));
         $this->ModelGame->getModelGenre()->setId    (filter_var($data['genre']       , FILTER_SANITIZE_NUMBER_INT));
 

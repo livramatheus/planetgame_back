@@ -26,6 +26,8 @@ class Game implements JsonSerializable {
     private $releaseDate;
     private $abstract;
     private $age;
+    private $contributor;
+    private $approved;
 
     public function getModelPublisher() {
         return $this->ModelPublisher;
@@ -84,18 +86,38 @@ class Game implements JsonSerializable {
         $this->age = $RelativeTime->timeAgo($releaseDate);
     }
 
+    public function getContributor() {
+        return $this->contributor;
+    }
+
+    public function setContributor($contributor) {
+        $this->contributor = $contributor;
+    }
+    
+    public function getApproved() {
+        return $this->approved;
+    }
+
+    public function setApproved($approved) {
+        $this->approved = $approved;
+    }
+
     public function getAll() {
         $sql = 'SELECT tb_game.id,
                        tb_game.name,
                        tb_game.release_date,
                        tb_game.abstract,
+                       tb_game.contributor,
+                       tb_game.approved,
                        tb_publisher.name as publisher,
                        tb_genre.name as genre
                   FROM tb_game
                   JOIN tb_publisher ON
                           tb_game.publisher = tb_publisher.id
                   JOIN tb_genre ON
-                          tb_game.genre = tb_genre.id;';
+                          tb_game.genre = tb_genre.id
+                 WHERE tb_game.approved = 1
+                 ORDER BY tb_game.id;';
 
         $PdoTransac = Connection::getConn()->query($sql);
         $data = [];
@@ -110,6 +132,8 @@ class Game implements JsonSerializable {
             $ModelGame->setReleaseDate($row['release_date']);
             $ModelGame->setAge($row['release_date']);
             $ModelGame->setAbstract($row['abstract']);
+            $ModelGame->setContributor($row['contributor']);
+            $ModelGame->setApproved($row['approved']);
             $ModelGame->setModelGenre($ModelGenre);
             $ModelGame->setModelPublisher($ModelPublisher);
 
@@ -127,6 +151,8 @@ class Game implements JsonSerializable {
                        tb_game.name,
                        tb_game.release_date,
                        tb_game.abstract,
+                       tb_game.contributor,
+                       tb_game.approved,
                        tb_publisher.name as publisher,
                        tb_genre.name as genre
                   FROM tb_game
@@ -134,7 +160,8 @@ class Game implements JsonSerializable {
                           tb_game.publisher = tb_publisher.id
                   JOIN tb_genre ON
                           tb_game.genre = tb_genre.id
-                 WHERE tb_game.id = ?;';
+                 WHERE tb_game.id = ?
+                   AND tb_game.approved = 1;';
 
         $params = [$this->id];
 
@@ -155,6 +182,8 @@ class Game implements JsonSerializable {
         $this->setReleaseDate($res['release_date']);
         $this->setAge($res['release_date']);
         $this->setAbstract($res['abstract']);
+        $this->setContributor($res['contributor']);
+        $this->setApproved($res['approved']);
         $this->setModelGenre($ModelGenre);
         $this->setModelPublisher($ModelPublisher);
 
@@ -187,15 +216,16 @@ class Game implements JsonSerializable {
     }
 
     public function insert() {
-        $sql = 'INSERT INTO `tb_game` (`name`, `publisher`, `release_date`, `genre`, `abstract`)
-                     VALUES (?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO `tb_game` (`name`, `publisher`, `release_date`, `genre`, `abstract`, `contributor`, `approved`)
+                     VALUES (?, ?, ?, ?, ?, ?, 0);';
 
         $params = [
             $this->name,
             $this->getModelPublisher()->getId(),
             $this->getReleaseDate(),
             $this->getModelGenre()->getId(), 
-            $this->getAbstract()
+            $this->getAbstract(),
+            $this->getContributor()
         ];
 
         $PdoTransac = Connection::getConn()->prepare($sql);
@@ -215,9 +245,11 @@ class Game implements JsonSerializable {
             'release_date' => $this->releaseDate,
             'age'          => $this->age,
             'abstract'     => $this->abstract,
+            'contributor'  => $this->contributor,
+            'approved'     => $this->approved,
             'publisher'    => $this->getModelPublisher()->getName(),
             'genre'        => $this->getModelGenre()->getName()
         ];
     }
-
+    
 }
