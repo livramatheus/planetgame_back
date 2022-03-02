@@ -87,7 +87,11 @@ class Game implements JsonSerializable {
     }
 
     public function getContributor() {
-        return $this->contributor;
+        if (!empty($this->contributor)) {
+            return $this->contributor;
+        }
+
+        return 'Anonymous';
     }
 
     public function setContributor($contributor) {
@@ -245,7 +249,7 @@ class Game implements JsonSerializable {
             'release_date' => $this->releaseDate,
             'age'          => $this->age,
             'abstract'     => $this->abstract,
-            'contributor'  => $this->contributor,
+            'contributor'  => $this->getContributor(),
             'approved'     => $this->approved,
             'publisher'    => $this->getModelPublisher()->getName(),
             'genre'        => $this->getModelGenre()->getName()
