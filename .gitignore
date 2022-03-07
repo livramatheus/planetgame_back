@@ -471,3 +471,5 @@ composer.phar
 
 # Local database credentials
 src/Config/env.local.php
+
+.phpunit.result.cache
