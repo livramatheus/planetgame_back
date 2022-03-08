@@ -84,7 +84,8 @@ class Admin implements ApiController, DefaultApiResponse, InputValidation {
                 ErrorLog::log($Error);
             }
         } else {
-
+            $Response->setResponseCode(400);
+            $Response->setData('Something went wdrong with your request.');
         }
 
         $Response->send();
