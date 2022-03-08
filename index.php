@@ -17,6 +17,6 @@ if (file_exists(__DIR__ . './src/Config/env.local.php')) {
 }
 
 $Router = new Router();
-$Router->addPage('Genre')->addPage('Publisher')->addPage('Game');
+$Router->addPage('Genre')->addPage('Publisher')->addPage('Game')->addPage('Admin');
 $Router->initRouter();
 $Router->requirePage();
