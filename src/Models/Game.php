@@ -242,6 +242,24 @@ class Game implements JsonSerializable {
         }
     }
 
+    public function approve() {
+        $sql = 'UPDATE tb_game
+                   SET approved = 1
+                 WHERE id = ?;';
+        
+        $params = [$this->getId()];
+        $PdoTransac = Connection::getConn()->prepare($sql);
+
+        try {
+            $PdoTransac->execute($params);
+        } catch (PDOException $Error) {
+            ErrorLog::log($Error);
+            throw new DatabaseException();
+        }
+
+        return true;
+    }
+
     public function jsonSerialize() {
         return [
             'id'           => $this->id,
