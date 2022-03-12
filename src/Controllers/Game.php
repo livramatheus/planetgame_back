@@ -4,6 +4,7 @@ namespace Livramatheus\PlanetgameBack\Controllers;
 
 use Exception;
 use Livramatheus\PlanetgameBack\Core\ErrorLog;
+use Livramatheus\PlanetgameBack\Core\JwtHandler;
 use Livramatheus\PlanetgameBack\Core\PostUtils;
 use Livramatheus\PlanetgameBack\Interfaces\DefaultApiResponse;
 use Livramatheus\PlanetgameBack\Models\Game as ModelGame;
@@ -42,6 +43,9 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
                 break;
             case 'insert':
                 $this->insert();
+                break;
+            case 'approve':
+                $this->approve();
                 break;
             default:
                 $this->defaultResponse();
@@ -125,6 +129,32 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         $Response->send();
     }
 
+    private function approve() {
+        $Response = new Response();
+
+        if ($this->validateInputApprove()) {
+            if (JwtHandler::checkToken()) {
+                try {
+                    $this->ModelGame->approve();
+
+                    $Response->setResponseCode(200);
+                    $Response->setData('Game approved successfully!');
+                } catch (Exception $Error) {
+                    $Response->setResponseCode(400);
+                    $Response->setData($Error->getMessage());
+                }
+            } else {
+                $Response->setResponseCode(401);
+                $Response->setData('You do not have credentials for this operation.');
+            }
+        } else {
+            $Response->setResponseCode(400);
+            $Response->setData('Request with missing or wrong parameters.');
+        }
+
+        $Response->send();
+    }
+
     private function isProfanityClear() : bool {
         $ProfCheck = new Check();
 
@@ -167,6 +197,14 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         $this->ModelGame->getModelGenre()->setId    (filter_var($data['genre']       , FILTER_SANITIZE_NUMBER_INT));
 
         return ($this->isProfanityClear() && $this->isFilled());
+    }
+
+    private function validateInputApprove() : bool {
+        $this->ModelGame = new ModelGame();
+
+        $data = PostUtils::getPostInput();
+        $this->ModelGame->setId(filter_var($data['id'], FILTER_SANITIZE_NUMBER_INT));
+        return !empty($this->ModelGame->getId());
     }
 
 }

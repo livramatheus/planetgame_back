@@ -33,27 +33,10 @@ class Admin implements ApiController, DefaultApiResponse, InputValidation {
             case 'login':
                 $this->login();
                 break;
-            case 'check':
-                $this->check();
-                break;
             default:
                 $this->defaultResponse();
                 break;
         }
-    }
-
-    private function check() {
-        $Response = new Response();
-
-        if (JwtHandler::checkToken()) {
-            $Response->setResponseCode(200);
-            $Response->setData('Valid');
-        } else {
-            $Response->setResponseCode(401);
-            $Response->setData('Invalid');
-        }
-
-        $Response->send();
     }
 
     private function login() {

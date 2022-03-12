@@ -1,5 +1,6 @@
 <?php
 
+use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
 use Livramatheus\PlanetgameBack\Core\Exceptions\ItemNotFoundException;
 use PHPUnit\Framework\TestCase;
 use Livramatheus\PlanetgameBack\Models\Game as ModelGame;
@@ -52,4 +53,10 @@ class GameTest extends TestCase {
         $ModelGame->delete();
     }
 
+    public function testApprove() {
+        $ModelGame = new ModelGame();
+        $ModelGame->setId(1);
+        $this->assertTrue($ModelGame->approve());
+    }
+    
 }
