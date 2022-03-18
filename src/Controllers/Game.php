@@ -57,7 +57,8 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         $this->ModelGame = new ModelGame();
         $Response = new Response();
 
-        $Response->setData($this->ModelGame->getAll());
+        $tokenValid = JwtHandler::checkToken();
+        $Response->setData($this->ModelGame->getAll($tokenValid));
         $Response->setResponseCode(200);
         $Response->send();
     }
