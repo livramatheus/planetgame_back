@@ -106,7 +106,7 @@ class Game implements JsonSerializable {
         $this->approved = $approved;
     }
 
-    public function getAll() {
+    public function getAll($showUnapprovedGames = false) {
         $sql = 'SELECT tb_game.id,
                        tb_game.name,
                        tb_game.release_date,
@@ -120,7 +120,7 @@ class Game implements JsonSerializable {
                           tb_game.publisher = tb_publisher.id
                   JOIN tb_genre ON
                           tb_game.genre = tb_genre.id
-                 WHERE tb_game.approved = 1
+                 ' . ($showUnapprovedGames ? '' : 'WHERE tb_game.approved = 1') . '
                  ORDER BY tb_game.id;';
 
         $PdoTransac = Connection::getConn()->query($sql);
