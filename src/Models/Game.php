@@ -150,7 +150,7 @@ class Game implements JsonSerializable {
         return $data;
     }
 
-    public function get() {
+    public function get($showUnapprovedGames = false) {
         $sql = 'SELECT tb_game.id,
                        tb_game.name,
                        tb_game.release_date,
@@ -165,7 +165,7 @@ class Game implements JsonSerializable {
                   JOIN tb_genre ON
                           tb_game.genre = tb_genre.id
                  WHERE tb_game.id = ?
-                   AND tb_game.approved = 1;';
+                   ' . ($showUnapprovedGames ? '' : 'AND tb_game.approved = 1') . ';';
 
         $params = [$this->id];
 
