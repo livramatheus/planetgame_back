@@ -65,7 +65,8 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
 
     private function get() {
         $Response = new Response();
-
+        $tokenValid = JwtHandler::checkToken();
+        
         if (!empty($this->getParams)) {
             $this->ModelGame = new ModelGame();
             $this->ModelGame->setId($this->getParams);
@@ -73,7 +74,7 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
             $Response->setResponseCode(200);
             
             try {
-                $dbData = $this->ModelGame->get();
+                $dbData = $this->ModelGame->get($tokenValid);
                 $Response->setData($dbData);
             } catch (Exception $Error) {
                 ErrorLog::log($Error);
