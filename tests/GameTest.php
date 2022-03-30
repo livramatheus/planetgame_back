@@ -1,6 +1,5 @@
 <?php
 
-use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
 use Livramatheus\PlanetgameBack\Core\Exceptions\ItemNotFoundException;
 use PHPUnit\Framework\TestCase;
 use Livramatheus\PlanetgameBack\Models\Game as ModelGame;
@@ -16,7 +15,7 @@ class GameTest extends TestCase {
     // get() - Existing game
     public function testGetExistingGame() {
         $ModelGame = new ModelGame();
-        $ModelGame->setId(3);
+        $ModelGame->setId(1);
 
         $this->assertInstanceOf('Livramatheus\\PlanetgameBack\\Models\\Game', $ModelGame->get());
         $this->assertIsString($ModelGame->getName());

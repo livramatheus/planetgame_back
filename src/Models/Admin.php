@@ -3,7 +3,11 @@
 namespace Livramatheus\PlanetgameBack\Models;
 
 use Livramatheus\PlanetgameBack\Core\Connection;
-use PDO;
+use Livramatheus\PlanetgameBack\Core\ErrorLog;
+use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
+use Livramatheus\PlanetgameBack\Core\Exceptions\EvironmentVarsException;
+use PDO, Exception;
+use PDOException;
 
 class Admin {
 
@@ -58,11 +62,19 @@ class Admin {
         
         $params = [$this->username, $this->getPasswordHashed()];
 
-        $PdoTransac = Connection::getConn()->prepare($sql);
-        $PdoTransac->execute($params);
-
-        $res = $PdoTransac->fetch(PDO::FETCH_ASSOC);
-
+        try {
+            $Connection = Connection::getConn();
+            $PdoTransac = $Connection->prepare($sql);
+            $PdoTransac->execute($params);
+            $res = $PdoTransac->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $Exception) {
+            ErrorLog::log($Exception);
+            throw new DatabaseException($Exception);
+        } catch (EvironmentVarsException|Exception $Exception) {
+            ErrorLog::log($Exception);
+            throw new Exception($Exception);
+        }
+        
         if (!$PdoTransac->rowCount()) {
             return false;
         }

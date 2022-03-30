@@ -3,7 +3,9 @@
 namespace Livramatheus\PlanetgameBack\Controllers;
 
 use Exception;
-use Livramatheus\PlanetgameBack\Core\ErrorLog;
+use Livramatheus\PlanetgameBack\Core\Enums\Message;
+use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
+use Livramatheus\PlanetgameBack\Core\Exceptions\ItemNotFoundException;
 use Livramatheus\PlanetgameBack\Core\JwtHandler;
 use Livramatheus\PlanetgameBack\Core\PostUtils;
 use Livramatheus\PlanetgameBack\Interfaces\DefaultApiResponse;
@@ -56,33 +58,45 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
     private function getAll() {
         $this->ModelGame = new ModelGame();
         $Response = new Response();
-
         $tokenValid = JwtHandler::checkToken();
-        $Response->setData($this->ModelGame->getAll($tokenValid));
-        $Response->setResponseCode(200);
+        
+        try {
+            $data = $this->ModelGame->getAll($tokenValid);
+            $Response->setData($data);
+            $Response->setResponseCode(200);
+        } catch (DatabaseException $Exception) {
+            $Response->setResponseCode(400);
+            $Response->setData($Exception->getMessage());            
+        } catch (Exception $Exception) {
+            $Response->setResponseCode(400);
+            $Response->setData(Message::UNKNOWN_ERROR);
+        }
+
         $Response->send();
     }
 
     private function get() {
-        $Response = new Response();
+        $Response   = new Response();
         $tokenValid = JwtHandler::checkToken();
         
         if (!empty($this->getParams)) {
             $this->ModelGame = new ModelGame();
             $this->ModelGame->setId($this->getParams);
-
-            $Response->setResponseCode(200);
             
             try {
                 $dbData = $this->ModelGame->get($tokenValid);
                 $Response->setData($dbData);
-            } catch (Exception $Error) {
-                ErrorLog::log($Error);
-                $Response->setData($Error->getMessage());
+                $Response->setResponseCode(200);
+            } catch (DatabaseException | ItemNotFoundException $Exception) {
+                $Response->setData($Exception->getMessage());
+                $Response->setResponseCode(400);
+            } catch (Exception $Exception) {
+                $Response->setData(Message::UNKNOWN_ERROR);
+                $Response->setResponseCode(400);
             }
         } else {
             $Response->setResponseCode(400);
-            $Response->setData('Request with missing parameters.');
+            $Response->setData(Message::MISSING_PARAMS_ERROR);
         }
 
         $Response->send();
@@ -97,35 +111,42 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
 
             try {
                 $this->ModelGame->delete();
+                $Response->setResponseCode(200);
                 $Response->setData('Game deleted successfully!');
-            } catch (Exception $Error) {
-                ErrorLog::log($Error);
-                $Response->setData($Error->getMessage());
+            } catch (DatabaseException | ItemNotFoundException $Exception) {
+                $Response->setResponseCode(400);
+                $Response->setData($Exception->getMessage());
             }
-
+            catch (Exception $Exception) {
+                $Response->setResponseCode(400);
+                $Response->setData(Message::UNKNOWN_ERROR);
+            }
         } else {
             $Response->setResponseCode(400);
-            $Response->setData('Request with missing parameters!');
+            $Response->setData(Message::MISSING_PARAMS_ERROR);
         }
 
         $Response->send();
     }
-
+    
     private function insert() {
         $Response = new Response();
 
         if ($this->validateInput()) {
             try {
                 $this->ModelGame->insert();
+                $Response->setResponseCode(200);
                 $Response->setData('Publisher inserted successfully!');
-            } catch (Exception $Error) {
-                ErrorLog::log($Error);
+            } catch (DatabaseException $Exception) {
                 $Response->setResponseCode(400);
-                $Response->setData($Error->getMessage());
+                $Response->setData($Exception->getMessage());
+            }catch (Exception $Exception) {
+                $Response->setResponseCode(400);
+                $Response->setData(Message::UNKNOWN_ERROR);
             }
         } else {
             $Response->setResponseCode(400);
-            $Response->setData('Request with missing or wrong parameters.');
+            $Response->setData(Message::MISSING_PARAMS_ERROR);
         }
 
         $Response->send();
@@ -141,17 +162,20 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
 
                     $Response->setResponseCode(200);
                     $Response->setData('Game approved successfully!');
-                } catch (Exception $Error) {
+                } catch (DatabaseException $Exception) {
                     $Response->setResponseCode(400);
-                    $Response->setData($Error->getMessage());
+                    $Response->setData($Exception->getMessage());
+                } catch (Exception $Exception) {
+                    $Response->setResponseCode(400);
+                    $Response->setData(Message::UNKNOWN_ERROR);
                 }
             } else {
                 $Response->setResponseCode(401);
-                $Response->setData('You do not have credentials for this operation.');
+                $Response->setData(Message::CREDENTIALS_ERROR);
             }
         } else {
             $Response->setResponseCode(400);
-            $Response->setData('Request with missing or wrong parameters.');
+            $Response->setData(Message::MISSING_PARAMS_ERROR);
         }
 
         $Response->send();
@@ -179,7 +203,7 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
 
     public function defaultResponse() {
         $Response = new Response();
-        $Response->setData('Missing parameters or actions.');
+        $Response->setData(Message::MISSING_PARAMS_ERROR);
         $Response->setResponseCode(400);
         $Response->send();
     }

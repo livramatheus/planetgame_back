@@ -16,7 +16,7 @@ class PublisherTest extends TestCase {
     // get() - Existing publisher
     public function testGetExistingPublisher() {
         $ModelPublisher = new ModelPublisher();
-        $ModelPublisher->setId(45);
+        $ModelPublisher->setId(1);
 
         $this->assertInstanceOf('Livramatheus\\PlanetgameBack\\Models\\Publisher', $ModelPublisher->get());
         $this->assertIsString($ModelPublisher->getName());
@@ -54,7 +54,7 @@ class PublisherTest extends TestCase {
     // delete() - Publisher with relations to another table
     public function testDeletePublisherRelatedToGame() {
         $ModelPublisher = new ModelPublisher();
-        $ModelPublisher->setId(45);
+        $ModelPublisher->setId(1);
 
         $this->expectException(DatabaseException::class);
         $ModelPublisher->delete();

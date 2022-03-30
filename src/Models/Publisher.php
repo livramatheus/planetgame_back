@@ -2,10 +2,12 @@
 
 namespace Livramatheus\PlanetgameBack\Models;
 
+use Exception;
 use JsonSerializable;
 use Livramatheus\PlanetgameBack\Core\Connection;
 use Livramatheus\PlanetgameBack\Core\ErrorLog;
 use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
+use Livramatheus\PlanetgameBack\Core\Exceptions\EnvironmentVarsException;
 use Livramatheus\PlanetgameBack\Core\Exceptions\ItemNotFoundException;
 use PDO;
 use PDOException;
@@ -73,7 +75,16 @@ class Publisher implements JsonSerializable {
         $sql = 'SELECT *
                   FROM `tb_publisher`;';
 
-        $PdoTransac = Connection::getConn()->query($sql);
+        try {
+            $Connection = Connection::getConn();
+            $PdoTransac = $Connection->query($sql);
+        } catch (PDOException $Exception) {
+            ErrorLog::log($Exception);
+            throw new DatabaseException();
+        } catch (EnvironmentVarsException $Exception) {
+            ErrorLog::log($Exception);
+            throw new Exception($Exception->getMessage());
+        }
 
         $data = [];
 
@@ -104,10 +115,18 @@ class Publisher implements JsonSerializable {
 
         $params = [$this->id];
 
-        $PdoTransac = Connection::getConn()->prepare($sql);
-        $PdoTransac->execute($params);
-
-        $res = $PdoTransac->fetch(PDO::FETCH_ASSOC);
+        try {
+            $Connection = Connection::getConn();
+            $PdoTransac = $Connection->prepare($sql);
+            $PdoTransac->execute($params);
+            $res = $PdoTransac->fetch(PDO::FETCH_ASSOC);
+        } catch (EnvironmentVarsException $Exception) {
+            ErrorLog::log($Exception);
+            throw new Exception();
+        } catch (PDOException $Exception) {
+            ErrorLog::log($Exception);
+            throw new DatabaseException();
+        }
 
         if (!$PdoTransac->rowCount()) {
             throw new ItemNotFoundException();
@@ -129,12 +148,15 @@ class Publisher implements JsonSerializable {
 
         $params = [$this->id];
 
-        $PdoTransac = Connection::getConn()->prepare($sql);
-
         try {
+            $Connection = Connection::getConn();
+            $PdoTransac = $Connection->prepare($sql);
             $PdoTransac->execute($params);
-        } catch (PDOException $Error) {
-            ErrorLog::log($Error);
+        } catch (EnvironmentVarsException $Exception) {
+            ErrorLog::log($Exception);
+            throw new Exception();
+        } catch (PDOException $Exception) {
+            ErrorLog::log($Exception);
             throw new DatabaseException();
         }
 
@@ -148,7 +170,8 @@ class Publisher implements JsonSerializable {
                                   VALUES (?, ?, ?, ?, ?);';
 
         try {
-            $PdoTransac = Connection::getConn()->prepare($sql);
+            $Connection = Connection::getConn();
+            $PdoTransac = $Connection->prepare($sql);
             $PdoTransac->execute([
                 $this->id,
                 $this->name,
@@ -156,9 +179,12 @@ class Publisher implements JsonSerializable {
                 $this->logo,
                 $this->website
             ]);
-        } catch (PDOException $Error) {
-            ErrorLog::log($Error);
+        } catch (PDOException $Exception) {
+            ErrorLog::log($Exception);
             throw new DatabaseException();
+        } catch (EnvironmentVarsException $Exception) {
+            ErrorLog::log($Exception);
+            throw new Exception();
         }
     }
 
