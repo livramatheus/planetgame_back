@@ -1,11 +1,14 @@
 <?php
 
 namespace Livramatheus\PlanetgameBack;
+
+use Livramatheus\PlanetgameBack\Core\PreflightHandler;
 use Livramatheus\PlanetgameBack\Core\Router;
 
 require __DIR__ . '/vendor/autoload.php';
-header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: authorization");
+new PreflightHandler();
 
 /* 
  * This file will only be required on dev environment,
