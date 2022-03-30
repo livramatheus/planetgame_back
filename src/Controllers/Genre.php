@@ -2,6 +2,9 @@
 
 namespace Livramatheus\PlanetgameBack\Controllers;
 
+use Exception;
+use Livramatheus\PlanetgameBack\Core\Enums\Message;
+use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
 use Livramatheus\PlanetgameBack\Core\Response,
     Livramatheus\PlanetgameBack\Models\Genre as ModelGenre,
     Livramatheus\PlanetgameBack\Interfaces\DefaultApiResponse;
@@ -35,17 +38,27 @@ class Genre implements DefaultApiResponse, ApiController {
 
     public function defaultResponse() {
         $Response = new Response();
-        $Response->setData('Missing parameters or actions.');
+        $Response->setData(Message::MISSING_PARAMS_ERROR);
         $Response->setResponseCode(400);
         $Response->send();
     }
 
     private function getAll() {
         $this->ModelGenre = new ModelGenre();
-        $Response   = new Response();
+        $Response = new Response();
 
-        $Response->setData($this->ModelGenre->getAll());
-        $Response->setResponseCode(200);
+        try {
+            $data = $this->ModelGenre->getAll();
+            $Response->setData($data);
+            $Response->setResponseCode(200);
+        } catch (DatabaseException $Exception) {
+            $Response->setData($Exception->getMessage());
+            $Response->setResponseCode(400);
+        } catch (Exception $Exception) {
+            $Response->setData(Message::UNKNOWN_ERROR);
+            $Response->setResponseCode(400);
+        }
+        
         $Response->send();
     }
 

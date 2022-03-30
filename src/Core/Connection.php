@@ -1,16 +1,29 @@
 <?php
 
 namespace Livramatheus\PlanetgameBack\Core;
+
+use Livramatheus\PlanetgameBack\Core\Exceptions\EnvironmentVarsException;
 use PDO, PDOException;
 
 class Connection {
 
     private static $conn;
+    private static $envData;
 
+    /**
+     * @throws EvironmentVarsException | PDOException
+     * @return PDO
+     */
     public static function getConn() {
 
         if (empty(self::$conn)) {
-            $x = explode('@', getenv('CLEARDB_DATABASE_URL'));
+            self::$envData = getenv('CLEARDB_DATABASE_URL');
+            
+            if (empty(self::$envData)) {
+                throw new EnvironmentVarsException();
+            }
+
+            $x = explode('@', self::$envData);
             $y = explode(':', $x[0]);
             $z = explode('/', $x[1]);
             $a = explode('/', $z[1]);
@@ -24,11 +37,7 @@ class Connection {
             try {
                 self::$conn = new PDO('mysql:host=' .$host. ';dbname=' . $dbname, $user, $password);
             } catch (PDOException $Error) {
-                ErrorLog::log($Error);
-                $Response = new Response();
-                $Response->setResponseCode(400);
-                $Response->setData('Database Error. Try again later.');
-                $Response->send();
+                throw new PDOException($Error);
             }
         }
 

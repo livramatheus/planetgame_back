@@ -2,6 +2,7 @@
 
 namespace Livramatheus\PlanetgameBack\Models;
 
+use Exception;
 use Livramatheus\PlanetgameBack\Core\Exceptions\ItemNotFoundException;
 use JsonSerializable;
 use Livramatheus\PlanetgameBack\Models\Publisher as ModelPublisher;
@@ -9,6 +10,7 @@ use Livramatheus\PlanetgameBack\Models\Genre as ModelGenre;
 use Livramatheus\PlanetgameBack\Core\Connection;
 use Livramatheus\PlanetgameBack\Core\ErrorLog;
 use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
+use Livramatheus\PlanetgameBack\Core\Exceptions\EnvironmentVarsException;
 use PDO;
 use PDOException;
 use RelativeTime\RelativeTime;
@@ -106,7 +108,7 @@ class Game implements JsonSerializable {
         $this->approved = $approved;
     }
 
-    public function getAll() {
+    public function getAll($showUnapprovedGames = false) {
         $sql = 'SELECT tb_game.id,
                        tb_game.name,
                        tb_game.release_date,
@@ -120,37 +122,47 @@ class Game implements JsonSerializable {
                           tb_game.publisher = tb_publisher.id
                   JOIN tb_genre ON
                           tb_game.genre = tb_genre.id
-                 WHERE tb_game.approved = 1
+                 ' . ($showUnapprovedGames ? '' : 'WHERE tb_game.approved = 1') . '
                  ORDER BY tb_game.id;';
 
-        $PdoTransac = Connection::getConn()->query($sql);
-        $data = [];
-
-        while($row = $PdoTransac->fetch(PDO::FETCH_ASSOC)) {
-            $ModelGame      = new Game();
-            $ModelPublisher = new ModelPublisher();
-            $ModelGenre     = new ModelGenre();
-            
-            $ModelGame->setId($row['id']);
-            $ModelGame->setName($row['name']);
-            $ModelGame->setReleaseDate($row['release_date']);
-            $ModelGame->setAge($row['release_date']);
-            $ModelGame->setAbstract($row['abstract']);
-            $ModelGame->setContributor($row['contributor']);
-            $ModelGame->setApproved($row['approved']);
-            $ModelGame->setModelGenre($ModelGenre);
-            $ModelGame->setModelPublisher($ModelPublisher);
-
-            $ModelPublisher->setName($row['publisher']);
-            $ModelGenre->setName($row['genre']);
-
-            $data[] = $ModelGame;
+        try {
+            $Connection = Connection::getConn();
+            $PdoTransac = $Connection->query($sql);
+            $data = [];
+    
+            while($row = $PdoTransac->fetch(PDO::FETCH_ASSOC)) {
+                $ModelGame      = new Game();
+                $ModelPublisher = new ModelPublisher();
+                $ModelGenre     = new ModelGenre();
+                
+                $ModelGame->setId($row['id']);
+                $ModelGame->setName($row['name']);
+                $ModelGame->setReleaseDate($row['release_date']);
+                $ModelGame->setAge($row['release_date']);
+                $ModelGame->setAbstract($row['abstract']);
+                $ModelGame->setContributor($row['contributor']);
+                $ModelGame->setApproved($row['approved']);
+                $ModelGame->setModelGenre($ModelGenre);
+                $ModelGame->setModelPublisher($ModelPublisher);
+    
+                $ModelPublisher->setName($row['publisher']);
+                $ModelGenre->setName($row['genre']);
+    
+                $data[] = $ModelGame;
+            }
+        } catch (EnvironmentVarsException $Exception) {
+            ErrorLog::log($Exception);
+            throw new DatabaseException();
+        } catch (PDOException $Exception) {
+            ErrorLog::log($Exception);
+            throw new Exception();
         }
 
         return $data;
+
     }
 
-    public function get() {
+    public function get($showUnapprovedGames = false) {
         $sql = 'SELECT tb_game.id,
                        tb_game.name,
                        tb_game.release_date,
@@ -165,14 +177,22 @@ class Game implements JsonSerializable {
                   JOIN tb_genre ON
                           tb_game.genre = tb_genre.id
                  WHERE tb_game.id = ?
-                   AND tb_game.approved = 1;';
+                   ' . ($showUnapprovedGames ? '' : 'AND tb_game.approved = 1') . ';';
 
         $params = [$this->id];
 
-        $PdoTransac = Connection::getConn()->prepare($sql);
-        $PdoTransac->execute($params);
-
-        $res = $PdoTransac->fetch(PDO::FETCH_ASSOC);
+        try {
+            $Connection = Connection::getConn();
+            $PdoTransac = $Connection->prepare($sql);
+            $PdoTransac->execute($params);
+            $res = $PdoTransac->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $Exception) {
+            ErrorLog::log($Exception);
+            throw new DatabaseException();
+        } catch (EnvironmentVarsException $Exception) {
+            ErrorLog::log($Exception);
+            throw new Exception();
+        }
         
         if (!$PdoTransac->rowCount()) {
             throw new ItemNotFoundException();
@@ -204,12 +224,15 @@ class Game implements JsonSerializable {
 
         $params = [$this->id];
 
-        $PdoTransac = Connection::getConn()->prepare($sql);
-        
         try {
+            $Connection = Connection::getConn();
+            $PdoTransac = $Connection->prepare($sql);
             $PdoTransac->execute($params);
-        } catch (PDOException $Error) {
-            ErrorLog::log($Error);
+        } catch (EnvironmentVarsException $Exception) {
+            ErrorLog::log($Exception);
+            throw new Exception();
+        } catch (PDOException $Exception) {
+            ErrorLog::log($Exception);
             throw new DatabaseException();
         }
 
@@ -218,7 +241,7 @@ class Game implements JsonSerializable {
         }
 
     }
-
+    
     public function insert() {
         $sql = 'INSERT INTO `tb_game` (`name`, `publisher`, `release_date`, `genre`, `abstract`, `contributor`, `approved`)
                      VALUES (?, ?, ?, ?, ?, ?, 0);';
@@ -232,12 +255,15 @@ class Game implements JsonSerializable {
             $this->getContributor()
         ];
 
-        $PdoTransac = Connection::getConn()->prepare($sql);
-        
         try {
+            $Connection = Connection::getConn();
+            $PdoTransac = $Connection->prepare($sql);
             $PdoTransac->execute($params);
-        } catch (PDOException $Error) {
-            ErrorLog::log($Error);
+        } catch (EnvironmentVarsException $Exception) {
+            ErrorLog::log($Exception);
+            throw new Exception();
+        } catch (PDOException $Exception) {
+            ErrorLog::log($Exception);
             throw new DatabaseException();
         }
     }
@@ -248,13 +274,17 @@ class Game implements JsonSerializable {
                  WHERE id = ?;';
         
         $params = [$this->getId()];
-        $PdoTransac = Connection::getConn()->prepare($sql);
 
         try {
+            $Connection = Connection::getConn();
+            $PdoTransac = $Connection->prepare($sql);
             $PdoTransac->execute($params);
         } catch (PDOException $Error) {
             ErrorLog::log($Error);
             throw new DatabaseException();
+        } catch (EnvironmentVarsException $Exception) {
+            ErrorLog::log($Exception);
+            throw new Exception();
         }
 
         return true;

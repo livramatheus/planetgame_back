@@ -2,9 +2,14 @@
 
 namespace Livramatheus\PlanetgameBack\Models;
 
+use Exception;
 use JsonSerializable;
 use Livramatheus\PlanetgameBack\Core\Connection;
+use Livramatheus\PlanetgameBack\Core\ErrorLog;
+use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
+use Livramatheus\PlanetgameBack\Core\Exceptions\EnvironmentVarsException;
 use PDO;
+use PDOException;
 
 class Genre implements JsonSerializable {
 
@@ -29,7 +34,17 @@ class Genre implements JsonSerializable {
 
     public function getAll() {
         $sql = 'SELECT * FROM tb_genre;';
-        $PdoTransac = Connection::getConn()->query($sql);
+
+        try {
+            $Connection = Connection::getConn();
+            $PdoTransac = $Connection->query($sql);
+        } catch (PDOException $Exception) {
+            ErrorLog::log($Exception);
+            throw new DatabaseException();
+        } catch (EnvironmentVarsException $Exception) {
+            ErrorLog::log($Exception);
+            throw new Exception();
+        }
 
         $data = [];
 

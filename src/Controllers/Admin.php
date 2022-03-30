@@ -3,7 +3,7 @@
 namespace Livramatheus\PlanetgameBack\Controllers;
 
 use Exception;
-use Livramatheus\PlanetgameBack\Core\ErrorLog;
+use Livramatheus\PlanetgameBack\Core\Enums\Message;
 use Livramatheus\PlanetgameBack\Core\Response;
 use Livramatheus\PlanetgameBack\Core\Exceptions\PermissionException;
 use Livramatheus\PlanetgameBack\Core\JwtHandler;
@@ -44,7 +44,9 @@ class Admin implements ApiController, DefaultApiResponse, InputValidation {
         
         if ($this->validateInput()) {
             try {
-                if (!$this->ModelAdmin->login()) {
+                $res = $this->ModelAdmin->login();
+
+                if (!$res) {
                     throw new PermissionException();
                 }
                 
@@ -57,18 +59,15 @@ class Admin implements ApiController, DefaultApiResponse, InputValidation {
                 $Response->setData(JwtHandler::createToken($payload));
                 $Response->setResponseCode(200);
             } catch (PermissionException $Error) {
-                // Permission specific exception: no need to log
                 $Response->setResponseCode(401);
                 $Response->setData($Error->getMessage());
             } catch (Exception $Error) {
-                // Structural exceptions: log is needed
                 $Response->setResponseCode(400);
-                $Response->setData('Something went wrong with your request.');
-                ErrorLog::log($Error);
+                $Response->setData(Message::UNKNOWN_ERROR);
             }
         } else {
             $Response->setResponseCode(400);
-            $Response->setData('Something went wdrong with your request.');
+            $Response->setData(Message::BAD_REQUEST_ERROR);
         }
 
         $Response->send();

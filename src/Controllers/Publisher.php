@@ -3,13 +3,18 @@
 namespace Livramatheus\PlanetgameBack\Controllers;
 
 use Exception;
+use Livramatheus\PlanetgameBack\Core\Enums\Message;
 use Livramatheus\PlanetgameBack\Core\ErrorLog;
+use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
+use Livramatheus\PlanetgameBack\Core\Exceptions\EnvironmentVarsException;
+use Livramatheus\PlanetgameBack\Core\Exceptions\ItemNotFoundException;
 use Livramatheus\PlanetgameBack\Core\Response;
 use Livramatheus\PlanetgameBack\Interfaces\ApiController;
 use Livramatheus\PlanetgameBack\Interfaces\DefaultApiResponse;
 use Livramatheus\PlanetgameBack\Interfaces\InputValidation;
 use Livramatheus\PlanetgameBack\Models\Publisher as ModelPublisher;
 use mofodojodino\ProfanityFilter\Check;
+use PDOException;
 
 class Publisher implements DefaultApiResponse, InputValidation, ApiController {
 
@@ -49,9 +54,19 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
     private function getAll() {
         $this->ModelPublisher = new ModelPublisher();
         $Response             = new Response();
+        
+        try {
+            $data = $this->ModelPublisher->getAll();
+            $Response->setData($data);
+            $Response->setResponseCode(200);
+        } catch (DatabaseException $Exception) {
+            $Response->setData($Exception->getMessage());
+            $Response->setResponseCode(400);
+        } catch (Exception $Exception) {
+            $Response->setData(Message::UNKNOWN_ERROR);
+            $Response->setResponseCode(400);
+        }
 
-        $Response->setData($this->ModelPublisher->getAll());
-        $Response->setResponseCode(200);
         $Response->send();
     }
 
@@ -62,18 +77,20 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
             $this->ModelPublisher = new ModelPublisher();
             $this->ModelPublisher->setId($this->getParams);
             
-            $Response->setResponseCode(200);
-            
             try {
                 $dbData = $this->ModelPublisher->get();
                 $Response->setData($dbData);
-            } catch (Exception $Exception) {
-                ErrorLog::log($Exception);
+                $Response->setResponseCode(200);
+            } catch (ItemNotFoundException $Exception) {
                 $Response->setData($Exception->getMessage());
+                $Response->setResponseCode(400);
+            } catch (DatabaseException | Exception $Exception) {
+                $Response->setData(Message::UNKNOWN_ERROR);
+                $Response->setResponseCode(400);
             }
         } else {
             $Response->setResponseCode(400);
-            $Response->setData('Request with missing parameters.');
+            $Response->setData(Message::MISSING_PARAMS_ERROR);
         }
 
         $Response->send();
@@ -85,19 +102,21 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
         if (!empty($this->getParams)) {
             $this->ModelPublisher = new ModelPublisher();
             $this->ModelPublisher->setId($this->getParams);
-            $Response->setResponseCode(200);
             
             try {
                 $this->ModelPublisher->delete();
+                $Response->setResponseCode(200);
                 $Response->setData('Publisher deleted successfully!');
-            } catch (Exception $Exception) {
-                ErrorLog::log($Exception);
+            } catch (ItemNotFoundException $Exception) {
+                $Response->setResponseCode(400);
                 $Response->setData($Exception->getMessage());
+            } catch (DatabaseException | Exception $Exception) {
+                $Response->setResponseCode(400);
+                $Response->setData(Message::UNKNOWN_ERROR);
             }
-
         } else {
             $Response->setResponseCode(400);
-            $Response->setData('Request with missing parameters.');
+            $Response->setData(Message::MISSING_PARAMS_ERROR);
         }
 
         $Response->send();
@@ -109,10 +128,11 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
         if ($this->validateInput()) {            
             try {
                 $this->ModelPublisher->insert();
+                $Response->setResponseCode(200);
                 $Response->setData('Publisher inserted successfully!');
-            } catch (Exception $Error) {
-                ErrorLog::log($Error);
-                $Response->setData($Error->getMessage());
+            } catch (Exception $Exception) {
+                $Response->setResponseCode(400);
+                $Response->setData(Message::UNKNOWN_ERROR);
             }
         } else {
             $Response->setResponseCode(400);
