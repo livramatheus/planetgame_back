@@ -6,6 +6,7 @@ use Exception;
 use Livramatheus\PlanetgameBack\Core\Enums\Message;
 use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
 use Livramatheus\PlanetgameBack\Core\Exceptions\ItemNotFoundException;
+use Livramatheus\PlanetgameBack\Core\Exceptions\PermissionException;
 use Livramatheus\PlanetgameBack\Core\JwtHandler;
 use Livramatheus\PlanetgameBack\Core\PostUtils;
 use Livramatheus\PlanetgameBack\Interfaces\DefaultApiResponse;
@@ -105,19 +106,22 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
     private function delete() {
         $Response = new Response();
 
-        if (!empty($this->getParams)) {
-            $this->ModelGame = new ModelGame();
-            $this->ModelGame->setId($this->getParams);
-
+        if ($this->validateInputDelete()) {
             try {
+                if (!JwtHandler::checkToken()) {
+                    throw new PermissionException();
+                }
+
                 $this->ModelGame->delete();
                 $Response->setResponseCode(200);
                 $Response->setData('Game deleted successfully!');
+            } catch (PermissionException $Error) {
+                $Response->setResponseCode(401);
+                $Response->setData($Error->getMessage());
             } catch (DatabaseException | ItemNotFoundException $Exception) {
                 $Response->setResponseCode(400);
                 $Response->setData($Exception->getMessage());
-            }
-            catch (Exception $Exception) {
+            } catch (Exception $Exception) {
                 $Response->setResponseCode(400);
                 $Response->setData(Message::UNKNOWN_ERROR);
             }
@@ -136,7 +140,7 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
             try {
                 $this->ModelGame->insert();
                 $Response->setResponseCode(200);
-                $Response->setData('Publisher inserted successfully!');
+                $Response->setData('Game inserted successfully!');
             } catch (DatabaseException $Exception) {
                 $Response->setResponseCode(400);
                 $Response->setData($Exception->getMessage());
@@ -226,6 +230,14 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
     }
 
     private function validateInputApprove() : bool {
+        $this->ModelGame = new ModelGame();
+
+        $data = PostUtils::getPostInput();
+        $this->ModelGame->setId(filter_var($data['id'], FILTER_SANITIZE_NUMBER_INT));
+        return !empty($this->ModelGame->getId());
+    }
+
+    private function validateInputDelete() : bool {
         $this->ModelGame = new ModelGame();
 
         $data = PostUtils::getPostInput();
