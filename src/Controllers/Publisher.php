@@ -5,6 +5,7 @@ namespace Livramatheus\PlanetgameBack\Controllers;
 use Exception;
 use Livramatheus\PlanetgameBack\Core\Enums\Message;
 use Livramatheus\PlanetgameBack\Core\ErrorLog;
+use Livramatheus\PlanetgameBack\Core\Exceptions\BadLanguageException;
 use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
 use Livramatheus\PlanetgameBack\Core\Exceptions\EnvironmentVarsException;
 use Livramatheus\PlanetgameBack\Core\Exceptions\ItemNotFoundException;
@@ -14,7 +15,6 @@ use Livramatheus\PlanetgameBack\Interfaces\DefaultApiResponse;
 use Livramatheus\PlanetgameBack\Interfaces\InputValidation;
 use Livramatheus\PlanetgameBack\Models\Publisher as ModelPublisher;
 use mofodojodino\ProfanityFilter\Check;
-use PDOException;
 
 class Publisher implements DefaultApiResponse, InputValidation, ApiController {
 
@@ -127,9 +127,13 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
         
         if ($this->validateInput()) {            
             try {
+                $this->isProfanityClear();
                 $this->ModelPublisher->insert();
                 $Response->setResponseCode(200);
                 $Response->setData('Publisher inserted successfully!');
+            } catch (BadLanguageException $Exception) {
+                $Response->setResponseCode(400);
+                $Response->setData($Exception->getMessage());
             } catch (Exception $Exception) {
                 $Response->setResponseCode(400);
                 $Response->setData(Message::UNKNOWN_ERROR);
@@ -143,15 +147,19 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
     }
 
 
-    private function isProfanityClear() : bool {
+    private function isProfanityClear() {
         $ProfCheck = new Check();
 
-        return !(
+        $profClear = (
             $ProfCheck->hasProfanity($this->ModelPublisher->getName())    ||
             $ProfCheck->hasProfanity($this->ModelPublisher->getFounded()) ||
             $ProfCheck->hasProfanity($this->ModelPublisher->getLogo())    ||
             $ProfCheck->hasProfanity($this->ModelPublisher->getWebsite())
         );
+
+        if ($profClear) {
+            throw new BadLanguageException();
+        }
     }
 
     private function isFilled() : bool {
@@ -178,7 +186,7 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
         $this->ModelPublisher->setLogo   (filter_input(INPUT_POST, 'logo'   , FILTER_SANITIZE_STRING));
         $this->ModelPublisher->setWebsite(filter_input(INPUT_POST, 'website', FILTER_VALIDATE_URL   ));
 
-        return ($this->isProfanityClear() && $this->isFilled());
+        return $this->isFilled();
     }
 
 }
