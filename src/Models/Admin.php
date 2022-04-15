@@ -5,7 +5,7 @@ namespace Livramatheus\PlanetgameBack\Models;
 use Livramatheus\PlanetgameBack\Core\Connection;
 use Livramatheus\PlanetgameBack\Core\ErrorLog;
 use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
-use Livramatheus\PlanetgameBack\Core\Exceptions\EvironmentVarsException;
+use Livramatheus\PlanetgameBack\Core\Exceptions\EnvironmentVarsException;
 use PDO, Exception;
 use PDOException;
 
@@ -70,7 +70,7 @@ class Admin {
         } catch (PDOException $Exception) {
             ErrorLog::log($Exception);
             throw new DatabaseException($Exception);
-        } catch (EvironmentVarsException|Exception $Exception) {
+        } catch (EnvironmentVarsException|Exception $Exception) {
             ErrorLog::log($Exception);
             throw new Exception($Exception);
         }
