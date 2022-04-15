@@ -11,7 +11,7 @@ class Connection {
     private static $envData;
 
     /**
-     * @throws EvironmentVarsException | PDOException
+     * @throws EnvironmentVarsException | PDOException
      * @return PDO
      */
     public static function getConn() {
