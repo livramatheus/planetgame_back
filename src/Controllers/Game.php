@@ -4,6 +4,7 @@ namespace Livramatheus\PlanetgameBack\Controllers;
 
 use Exception;
 use Livramatheus\PlanetgameBack\Core\Enums\Message;
+use Livramatheus\PlanetgameBack\Core\Exceptions\BadLanguageException;
 use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
 use Livramatheus\PlanetgameBack\Core\Exceptions\ItemNotFoundException;
 use Livramatheus\PlanetgameBack\Core\Exceptions\PermissionException;
@@ -138,10 +139,11 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
 
         if ($this->validateInput()) {
             try {
+                $this->isProfanityClear();
                 $this->ModelGame->insert();
                 $Response->setResponseCode(200);
                 $Response->setData('Game inserted successfully!');
-            } catch (DatabaseException $Exception) {
+            } catch (DatabaseException | BadLanguageException $Exception) {
                 $Response->setResponseCode(400);
                 $Response->setData($Exception->getMessage());
             }catch (Exception $Exception) {
@@ -185,15 +187,19 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         $Response->send();
     }
 
-    private function isProfanityClear() : bool {
+    private function isProfanityClear() {
         $ProfCheck = new Check();
 
-        return !(
+        $profClear = (
             $ProfCheck->hasProfanity($this->ModelGame->getName())        ||
             $ProfCheck->hasProfanity($this->ModelGame->getReleaseDate()) ||
             $ProfCheck->hasProfanity($this->ModelGame->getAbstract())    ||
             $ProfCheck->hasProfanity($this->ModelGame->getContributor())
         );
+
+        if ($profClear) {
+            throw new BadLanguageException();
+        }
     }
 
     private function isFilled() : bool {
@@ -226,7 +232,7 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         $this->ModelGame->getModelPublisher()->setId(filter_var($data['publisher']   , FILTER_SANITIZE_NUMBER_INT));
         $this->ModelGame->getModelGenre()->setId    (filter_var($data['genre']       , FILTER_SANITIZE_NUMBER_INT));
 
-        return ($this->isProfanityClear() && $this->isFilled());
+        return $this->isFilled();
     }
 
     private function validateInputApprove() : bool {
