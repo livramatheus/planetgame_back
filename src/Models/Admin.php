@@ -6,9 +6,16 @@ use Livramatheus\PlanetgameBack\Core\Connection;
 use Livramatheus\PlanetgameBack\Core\ErrorLog;
 use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
 use Livramatheus\PlanetgameBack\Core\Exceptions\EnvironmentVarsException;
-use PDO, Exception;
+use PDO;
+use Exception;
 use PDOException;
 
+/**
+ * Admin model class
+ * 
+ * @package Model
+ * @author Matheus do Livramento
+ */
 class Admin {
 
     private $username;
@@ -48,10 +55,22 @@ class Admin {
         $this->lastName = $lastName;
     }
 
-    private function getPasswordHashed() {
+    /**
+     * Returns the hashed version of Admin's password
+     * 
+     * @return string
+     */
+    private function getPasswordHashed() : string {
         return hash('sha512', getenv('ADMIN_SALT') . $this->password);
     }
 
+    /**
+     * Searches database for an Admin matching supplied credentials
+     * 
+     * @return bool
+     * @throws DatabaseException
+     * @throws Exception
+     */
     public function login() {
         $sql = 'SELECT user_name,
                        first_name,

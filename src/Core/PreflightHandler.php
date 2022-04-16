@@ -2,6 +2,12 @@
 
 namespace Livramatheus\PlanetgameBack\Core;
 
+/**
+ * In charge of managing Preflight requests sent by the front-end
+ * 
+ * @package Core
+ * @author Matheus do Livramento
+ */
 class PreflightHandler {
 
     public function __construct() {

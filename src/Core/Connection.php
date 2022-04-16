@@ -5,13 +5,21 @@ namespace Livramatheus\PlanetgameBack\Core;
 use Livramatheus\PlanetgameBack\Core\Exceptions\EnvironmentVarsException;
 use PDO, PDOException;
 
+/**
+ * Database connection manager class
+ * 
+ * @package Core
+ * @author Matheus do Livramento
+ */
 class Connection {
 
     private static $conn;
     private static $envData;
 
     /**
-     * @throws EnvironmentVarsException | PDOException
+     * Returns a connection with the database using singleton pattern
+     * @throws EnvironmentVarsException
+     * @throws PDOException
      * @return PDO
      */
     public static function getConn() {

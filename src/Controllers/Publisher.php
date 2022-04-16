@@ -4,10 +4,8 @@ namespace Livramatheus\PlanetgameBack\Controllers;
 
 use Exception;
 use Livramatheus\PlanetgameBack\Core\Enums\Message;
-use Livramatheus\PlanetgameBack\Core\ErrorLog;
 use Livramatheus\PlanetgameBack\Core\Exceptions\BadLanguageException;
 use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
-use Livramatheus\PlanetgameBack\Core\Exceptions\EnvironmentVarsException;
 use Livramatheus\PlanetgameBack\Core\Exceptions\ItemNotFoundException;
 use Livramatheus\PlanetgameBack\Core\Response;
 use Livramatheus\PlanetgameBack\Interfaces\ApiController;
@@ -16,6 +14,12 @@ use Livramatheus\PlanetgameBack\Interfaces\InputValidation;
 use Livramatheus\PlanetgameBack\Models\Publisher as ModelPublisher;
 use mofodojodino\ProfanityFilter\Check;
 
+/**
+ * Publisher controller class
+ * 
+ * @package Controller
+ * @author Matheus do Livramento
+ */
 class Publisher implements DefaultApiResponse, InputValidation, ApiController {
 
     /** @var ModelPublisher */
@@ -51,6 +55,9 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
         }
     }
 
+    /**
+     * Sends to front-end a list of every publisher present on database
+     */
     private function getAll() {
         $this->ModelPublisher = new ModelPublisher();
         $Response             = new Response();
@@ -70,6 +77,10 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
         $Response->send();
     }
 
+    /**
+     * Sends to front-end the publisher requested through queryparams
+     * Sends an error message in case the publisher was not found
+     */
     private function get() {
         $Response = new Response();
         
@@ -96,6 +107,10 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
         $Response->send();
     }
 
+    /**
+     * Deletes publisher requested through queryparams and sends a success message
+     * Sends an error message in case the publisher was not found
+     */
     private function delete() {
         $Response = new Response();
         
@@ -122,6 +137,10 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
         $Response->send();
     }
 
+    /**
+     * Inserts a new publisher into the database
+     * Sends an error message in case of missing fields or bad words
+     */
     private function insert() {
         $Response = new Response();
         
@@ -146,7 +165,11 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
         $Response->send();
     }
 
-
+    /**
+     * Checks bad words in user input when inserting a new publisher
+     * 
+     * @throws BadLanguageException
+     */
     private function isProfanityClear() {
         $ProfCheck = new Check();
 
@@ -162,6 +185,11 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
         }
     }
 
+    /**
+     * Checks if mandatory fields for a new publisher are filled
+     * 
+     * @return bool
+     */
     private function isFilled() : bool {
         return (
             !empty($this->ModelPublisher->getName())    &&
@@ -171,6 +199,9 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
         );
     }
 
+    /**
+     * Sends a default response in case of a problematic request
+     */
     public function defaultResponse() {
         $Response = new Response();
         $Response->setData('Missing parameters or actions.');
@@ -178,6 +209,11 @@ class Publisher implements DefaultApiResponse, InputValidation, ApiController {
         $Response->send();
     }
 
+    /**
+     * Generic input validator implementation
+     * 
+     * @return bool
+     */
     public function validateInput() : bool {
         $this->ModelPublisher = new ModelPublisher();
 
