@@ -2,6 +2,12 @@
 
 namespace Livramatheus\PlanetgameBack\Core;
 
+/**
+ * Manages every response sent back to the front-end
+ * 
+ * @package Core
+ * @author Matheus do Livramento
+ */
 class Response {
 
     private $data;
@@ -28,14 +34,15 @@ class Response {
     }
 
     /**
-     * @todo utf8_encode was used to fix strings with special characters,
-     * however when "data" is an object or an array, utf8_encode crashes
-     * for now, it will be removed
+     * Prepares a JSON response
      */
     public function getDataJson() : string {
         return json_encode(['data' => $this->data]);
     }
 
+    /**
+     * Sends a response
+     */
     public function send() {
         header('Content-Type: application/json');
         http_response_code($this->getResponseCode());

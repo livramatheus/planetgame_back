@@ -5,11 +5,17 @@ namespace Livramatheus\PlanetgameBack\Controllers;
 use Exception;
 use Livramatheus\PlanetgameBack\Core\Enums\Message;
 use Livramatheus\PlanetgameBack\Core\Exceptions\DatabaseException;
-use Livramatheus\PlanetgameBack\Core\Response,
-    Livramatheus\PlanetgameBack\Models\Genre as ModelGenre,
-    Livramatheus\PlanetgameBack\Interfaces\DefaultApiResponse;
+use Livramatheus\PlanetgameBack\Core\Response;
+use Livramatheus\PlanetgameBack\Models\Genre as ModelGenre;
+use Livramatheus\PlanetgameBack\Interfaces\DefaultApiResponse;
 use Livramatheus\PlanetgameBack\Interfaces\ApiController;
 
+/**
+ * Genre controller class
+ * 
+ * @package Controller
+ * @author Matheus do Livramento
+ */
 class Genre implements DefaultApiResponse, ApiController {
 
     /** @var ModelGenre */
@@ -36,6 +42,9 @@ class Genre implements DefaultApiResponse, ApiController {
         }
     }
 
+    /**
+     * Sends a default response in case of a problematic request
+     */
     public function defaultResponse() {
         $Response = new Response();
         $Response->setData(Message::MISSING_PARAMS_ERROR);
@@ -43,6 +52,9 @@ class Genre implements DefaultApiResponse, ApiController {
         $Response->send();
     }
 
+    /**
+     * Sends to front-end a list of every genre present on database
+     */
     private function getAll() {
         $this->ModelGenre = new ModelGenre();
         $Response = new Response();

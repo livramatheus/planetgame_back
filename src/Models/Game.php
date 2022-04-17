@@ -15,6 +15,12 @@ use PDO;
 use PDOException;
 use RelativeTime\RelativeTime;
 
+/**
+ * Game model class
+ * 
+ * @package Model
+ * @author Matheus do Livramento
+ */
 class Game implements JsonSerializable {
 
     /** @var ModelPublisher */
@@ -83,11 +89,19 @@ class Game implements JsonSerializable {
         return $this->age;
     }
 
+    /**
+     * Takes a date as parameter to create the following sentence: "53 years ago"
+     * 
+     * @param string $releaseDate Game's release date
+     */
     public function setAge($releaseDate) {
         $RelativeTime = new RelativeTime(['truncate' => 1]);
         $this->age = $RelativeTime->timeAgo($releaseDate);
     }
 
+    /**
+     * @return string Returns contributor name or "Anonymous" if it is empty
+     */
     public function getContributor() {
         if (!empty($this->contributor)) {
             return $this->contributor;
@@ -108,6 +122,14 @@ class Game implements JsonSerializable {
         $this->approved = $approved;
     }
 
+    /**
+     * Queries database and returns an array of publishers
+     * 
+     * @param bool $showUnapprovedGames Whether or not unapproved games should be included in the result
+     * @return array
+     * @throws DatabaseException
+     * @throws Exception
+     */
     public function getAll($showUnapprovedGames = false) {
         $sql = 'SELECT tb_game.id,
                        tb_game.name,
@@ -159,9 +181,17 @@ class Game implements JsonSerializable {
         }
 
         return $data;
-
     }
 
+    /**
+     * Queries database and returns the desired game
+     * 
+     * @param bool $showUnapprovedGames Whether or not unapproved games should be selectable
+     * @return Game
+     * @throws ItemNotFoundException
+     * @throws DatabaseException
+     * @throws Exception
+     */
     public function get($showUnapprovedGames = false) {
         $sql = 'SELECT tb_game.id,
                        tb_game.name,
@@ -217,6 +247,13 @@ class Game implements JsonSerializable {
         return $this;
     }
 
+    /**
+     * Deletes a game by ID
+     * 
+     * @throws ItemNotFoundException
+     * @throws DatabaseException
+     * @throws Exception
+     */
     public function delete() {
         $sql = 'DELETE
                   FROM tb_game
@@ -241,7 +278,13 @@ class Game implements JsonSerializable {
         }
 
     }
-    
+
+    /**
+     * Inserts a new Game into the database
+     * 
+     * @throws DatabaseException
+     * @throws Exception
+     */
     public function insert() {
         $sql = 'INSERT INTO `tb_game` (`name`, `publisher`, `release_date`, `genre`, `abstract`, `contributor`, `approved`)
                      VALUES (?, ?, ?, ?, ?, ?, 0);';
@@ -268,6 +311,13 @@ class Game implements JsonSerializable {
         }
     }
 
+    /**
+     * Approves a game
+     * 
+     * @return bool
+     * @throws DatabaseException
+     * @throws Exception
+     */
     public function approve() {
         $sql = 'UPDATE tb_game
                    SET approved = 1
@@ -290,7 +340,12 @@ class Game implements JsonSerializable {
         return true;
     }
 
-    public function jsonSerialize() {
+    /**
+     * Returns model's JSON representation
+     * 
+     * @return mixed
+     */
+    public function jsonSerialize() : mixed {
         return [
             'id'           => $this->id,
             'name'         => $this->name,

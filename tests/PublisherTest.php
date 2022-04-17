@@ -54,7 +54,7 @@ class PublisherTest extends TestCase {
     // delete() - Publisher with relations to another table
     public function testDeletePublisherRelatedToGame() {
         $ModelPublisher = new ModelPublisher();
-        $ModelPublisher->setId(1);
+        $ModelPublisher->setId(11);
 
         $this->expectException(DatabaseException::class);
         $ModelPublisher->delete();

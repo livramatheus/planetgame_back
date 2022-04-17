@@ -13,6 +13,12 @@ use PDO;
 use PDOException;
 use RelativeTime\RelativeTime;
 
+/**
+ * Publisher model class
+ * 
+ * @package Model
+ * @author Matheus do Livramento
+ */
 class Publisher implements JsonSerializable {
 
     private $id;
@@ -66,11 +72,23 @@ class Publisher implements JsonSerializable {
         return $this->age;
     }
 
+    /**
+     * Takes a date as parameter to create the following sentence: "53 years ago"
+     * 
+     * @param string $releaseDate Publisher's release date
+     */
     public function setAge($age) {
         $RelativeTime = new RelativeTime(['truncate' => 1]);
         $this->age = $RelativeTime->timeAgo($age);
     }
 
+    /**
+     * Queries database and returns an array of publishers
+     * 
+     * @return array
+     * @throws DatabaseException
+     * @throws Exception
+     */
     public function getAll() {
         $sql = 'SELECT *
                   FROM `tb_publisher`;';
@@ -104,6 +122,14 @@ class Publisher implements JsonSerializable {
         return $data;
     }
 
+    /**
+     * Queries database and returns the desired publisher
+     * 
+     * @return Publisher
+     * @throws ItemNotFoundException
+     * @throws DatabaseException
+     * @throws Exception
+     */
     public function get() {
         $sql = 'SELECT id,
                        name,
@@ -141,6 +167,12 @@ class Publisher implements JsonSerializable {
         return $this;
     }
 
+    /**
+     * Deletes a publisher by ID
+     * @throws ItemNotFoundException
+     * @throws DatabaseException
+     * @throws Exception
+     */
     public function delete() {
         $sql = 'DELETE
                   FROM tb_publisher
@@ -165,6 +197,12 @@ class Publisher implements JsonSerializable {
         }
     }
 
+    /**
+     * Inserts a new Publisher into the database
+     * 
+     * @throws DatabaseException
+     * @throws Exception
+     */
     public function insert() {
         $sql = 'INSERT INTO tb_publisher (id, name, founded, logo, website)
                                   VALUES (?, ?, ?, ?, ?);';
@@ -188,7 +226,12 @@ class Publisher implements JsonSerializable {
         }
     }
 
-    public function jsonSerialize() {
+    /**
+     * Returns model's JSON representation
+     * 
+     * @return mixed
+     */
+    public function jsonSerialize() : mixed {
         return [
             'id'      => $this->id,
             'name'    => $this->name,

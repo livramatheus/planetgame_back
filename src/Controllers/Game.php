@@ -19,6 +19,12 @@ use Livramatheus\PlanetgameBack\Core\Response;
 use Livramatheus\PlanetgameBack\Interfaces\ApiController;
 use mofodojodino\ProfanityFilter\Check;
 
+/**
+ * Game controller class
+ * 
+ * @package Controller
+ * @author Matheus do Livramento
+ */
 class Game implements DefaultApiResponse, InputValidation, ApiController {
 
     /** @var ModelGame */
@@ -57,6 +63,12 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         }
     }
 
+    /**
+     * Sends to front-end a list of every game present on database
+     * This function has two possible outcomes:
+     * 1. If the requester is an Admin, it will include unnaproved games in the result set
+     * 2. Otherwise, unnaproved games will be ommited
+     */
     private function getAll() {
         $this->ModelGame = new ModelGame();
         $Response = new Response();
@@ -77,6 +89,14 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         $Response->send();
     }
 
+    /**
+     * Sends to front-end the game requested through queryparams
+     * This function has three possible outcomes:
+     * 1. If the requester is an Admin, it may return unnaproved games
+     * 2. If the requester is not an Admin and he tries to fetch a unnaproved game
+     * a message stating that the game was not found will be sent to the client
+     * 3. Sends an error message in case the does not exist
+     */
     private function get() {
         $Response   = new Response();
         $tokenValid = JwtHandler::checkToken();
@@ -104,6 +124,13 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         $Response->send();
     }
 
+    /**
+     * Deletes the game requested through queryparams and sends a success message
+     * Sends an error message in case the game was not found
+     * This action can only be performed by an admin
+     * 
+     * @throws PermissionException
+     */
     private function delete() {
         $Response = new Response();
 
@@ -134,6 +161,10 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         $Response->send();
     }
     
+    /**
+     * Inserts a new game into the database
+     * Sends an error message in case of missing fields or bad words
+     */
     private function insert() {
         $Response = new Response();
 
@@ -158,6 +189,10 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         $Response->send();
     }
 
+    /**
+     * Approves an existing game.
+     * This action is restricted to Admins by checking the validity of JWT token.
+     */
     private function approve() {
         $Response = new Response();
 
@@ -187,6 +222,11 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         $Response->send();
     }
 
+    /**
+     * Checks bad words in user input when inserting a new Game
+     * 
+     * @throws BadLanguageException
+     */
     private function isProfanityClear() {
         $ProfCheck = new Check();
 
@@ -202,6 +242,11 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         }
     }
 
+    /**
+     * Checks if mandatory fields for a new game are filled
+     * 
+     * @return bool
+     */
     private function isFilled() : bool {
         return (
             !empty($this->ModelGame->getName())                    &&
@@ -211,6 +256,9 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         );
     }
 
+    /**
+     * Sends a default response in case of a problematic request
+     */
     public function defaultResponse() {
         $Response = new Response();
         $Response->setData(Message::MISSING_PARAMS_ERROR);
@@ -218,6 +266,11 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         $Response->send();
     }
 
+    /**
+     * Generic input validator implementation
+     * 
+     * @return bool
+     */
     public function validateInput() : bool {
         $this->ModelGame = new ModelGame();
         $this->ModelGame->setModelGenre(new ModelGenre());
@@ -235,6 +288,11 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         return $this->isFilled();
     }
 
+    /**
+     * Input validator for game approval request
+     * 
+     * @return bool
+     */
     private function validateInputApprove() : bool {
         $this->ModelGame = new ModelGame();
 
@@ -243,6 +301,11 @@ class Game implements DefaultApiResponse, InputValidation, ApiController {
         return !empty($this->ModelGame->getId());
     }
 
+    /**
+     * Input validator for game removal request
+     * 
+     * @return bool
+     */
     private function validateInputDelete() : bool {
         $this->ModelGame = new ModelGame();
 
