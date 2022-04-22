@@ -11,6 +11,12 @@ use Livramatheus\PlanetgameBack\Core\Exceptions\EnvironmentVarsException;
 use PDO;
 use PDOException;
 
+/**
+ * Genre model class
+ * 
+ * @package Model
+ * @author Matheus do Livramento
+ */
 class Genre implements JsonSerializable {
 
     private $id;
@@ -32,6 +38,13 @@ class Genre implements JsonSerializable {
         $this->name = $name;
     }
 
+    /**
+     * Queries database and returns an array of genres
+     * 
+     * @return array
+     * @throws DatabaseException
+     * @throws Exception
+     */
     public function getAll() {
         $sql = 'SELECT * FROM tb_genre;';
 
@@ -60,7 +73,12 @@ class Genre implements JsonSerializable {
         return $data;
     }
 
-    public function jsonSerialize() {
+    /**
+     * Returns model's JSON representation
+     * 
+     * @return mixed
+     */
+    public function jsonSerialize() : mixed {
         return [
             'id'   => $this->id,
             'name' => $this->name

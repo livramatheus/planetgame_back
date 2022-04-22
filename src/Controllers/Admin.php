@@ -13,6 +13,12 @@ use Livramatheus\PlanetgameBack\Interfaces\DefaultApiResponse;
 use Livramatheus\PlanetgameBack\Interfaces\InputValidation;
 use Livramatheus\PlanetgameBack\Models\Admin as ModelAdmin;
 
+/**
+ * Admin controller class
+ * 
+ * @package Controller
+ * @author Matheus do Livramento
+ */
 class Admin implements ApiController, DefaultApiResponse, InputValidation {
 
     /** @var ModelAdmin */
@@ -39,6 +45,14 @@ class Admin implements ApiController, DefaultApiResponse, InputValidation {
         }
     }
 
+    /**
+     * Manages loggin attempt by user. It may send the following responses:
+     * JWT token on success - 200
+     * Denial notice in case of wrong credentials - 401
+     * Generic error message for assorted errors - 400
+     * 
+     * @throws PermissionException
+     */
     private function login() {
         $Response = new Response();
         
@@ -73,6 +87,11 @@ class Admin implements ApiController, DefaultApiResponse, InputValidation {
         $Response->send();
     }
 
+    /**
+     * Checks if mandatory fields for the login action are filled
+     * 
+     * @return bool
+     */
     private function isFilled() : bool {
         return (
             !empty($this->ModelAdmin->getUsername()) &&
@@ -80,6 +99,11 @@ class Admin implements ApiController, DefaultApiResponse, InputValidation {
         );
     }
 
+    /**
+     * Generic input validator implementation
+     * 
+     * @return bool
+     */
     public function validateInput() : bool {
         $this->ModelAdmin = new ModelAdmin;
 
@@ -90,7 +114,10 @@ class Admin implements ApiController, DefaultApiResponse, InputValidation {
 
         return $this->isFilled();
     }
-
+    
+    /**
+     * Sends a default response in case of a problematic request
+     */
     public function defaultResponse() {
         $Response = new Response();
         $Response->setData('Missing parameters or actions.');
