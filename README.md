@@ -53,7 +53,7 @@
 </p>
 
 <p>
-    Another crucial mechanism that I adopted for the first time on this project was having <b>three separate environments</b>: development, <a href="https://test-planetgame.netlify.app/">test</a> and <a href="https://planetgame.netlify.app/">production</a>. This was easily achivable by pushing code to distinct git branches and turning on auto deploy on Netlify and Heroku.
+    Another crucial mechanism that I adopted for the first time on this project was having <b>three separate environments</b>: development, test and production. This was easily achivable by pushing code to distinct git branches and turning on auto deploy on Netlify and Heroku.
 </p>
 
 <p>
@@ -275,7 +275,7 @@
 </p>
 
 <p>
-    Outro mecanismo crucial que adotei pela primeira vez neste projeto foi ter <b>três ambientes separados</b>: desenvolvimento, <a href="https://test-planetgame.netlify.app/">teste</a> e <a href="https://planetgame.netlify.app/">produção</a>. Isso foi facilmente alcançável enviando código para <em>branches</em> distintas do git e ativando o <em>auto deploy</em> no Netlify e no Heroku.
+    Outro mecanismo crucial que adotei pela primeira vez neste projeto foi ter <b>três ambientes separados</b>: desenvolvimento, teste e produção. Isso foi facilmente alcançável enviando código para <em>branches</em> distintas do git e ativando o <em>auto deploy</em> no Netlify e no Heroku.
 </p>
 
 <p>
